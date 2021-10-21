@@ -10,6 +10,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.CDI;
+import javax.inject.Inject;
+import javax.interceptor.AroundInvoke;
+import javax.interceptor.InvocationContext;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -18,6 +23,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.webbeans.config.WebBeansContext;
+import org.apache.webbeans.spi.ContainerLifecycle;
 
 /**
  *
@@ -26,6 +33,9 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet(urlPatterns = {"/AddViolation"})
 public class AddViolationServlet extends HttpServlet {
 
+    @Inject
+    ViolationService vs;
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -109,7 +119,12 @@ public class AddViolationServlet extends HttpServlet {
             requestDispatcher.forward(request, response);
         }
         else{
-            addViolation(request);
+            String carNum = request.getParameter("carNum");
+            String ownerName = request.getParameter("ownerName");
+            String violationType = request.getParameter("violationType");
+            LocalDateTime dateTime = LocalDateTime.parse(request.getParameter("dateTime"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            float fine = Float.parseFloat(request.getParameter("fine"));
+            addViolation(vs.createViolation(carNum, ownerName, violationType, dateTime, fine));
             response.sendRedirect(request.getContextPath()+"/violationList.html");
         }
     }
@@ -135,8 +150,8 @@ public class AddViolationServlet extends HttpServlet {
         return role.equals("Administrator");
     }
     
-    private void addViolation(HttpServletRequest request) throws IOException{
-                StringBuilder buffer;
+    private void addViolation(Violation v) throws IOException{
+        StringBuilder buffer;
         try (FileReader fr = new FileReader(getServletContext().getRealPath("/violationList.html"))) {
             Scanner scan = new Scanner(fr);
             buffer = new StringBuilder();
@@ -150,15 +165,12 @@ public class AddViolationServlet extends HttpServlet {
                 }
                 buffer.append(str).append('\n');
             }
-            DateTimeFormatter dtf1 = DateTimeFormatter.ofPattern("ddMMyy_HHmm");
-            DateTimeFormatter dtf2 = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            LocalDateTime datetime = LocalDateTime.parse(request.getParameter("dateTime"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-            String datetimeStr1 = datetime.format(dtf1);
-            String datetimeStr2 = datetime.format(dtf2);
-            str="<tr><td>"+request.getParameter("carNum")+"_"+request.getParameter("violationType").replace(" ", "_")+
-                    "_"+datetimeStr1+"</td><td>"+request.getParameter("carNum")+
-                    "</td><td>"+request.getParameter("ownerName")+"</td><td>"+request.getParameter("violationType")+
-                    "</td><td>"+datetimeStr2+"</td><td>"+request.getParameter("fine")+"</td></tr>\n";
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            LocalDateTime datetime = v.getDateTime();
+            String datetimeStr = datetime.format(dtf);
+            str="<tr><td>"+v.getID()+"</td><td>"+v.getCarNum()+
+                    "</td><td>"+v.getOwnerName()+"</td><td>"+v.getViolationType()+
+                    "</td><td>"+datetimeStr+"</td><td>"+v.getFineInUAH()+"</td></tr>\n";
             buffer.append(str).append('\n');
             while(scan.hasNextLine()){
                str=scan.nextLine();
@@ -170,7 +182,8 @@ public class AddViolationServlet extends HttpServlet {
             fw.close();
         }
     }
-
+    
+    
     /**
      * Returns a short description of the servlet.
      *
@@ -178,7 +191,7 @@ public class AddViolationServlet extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Short description";
+        return "AddViolationServlet";
     }// </editor-fold>
 
 }

@@ -48,15 +48,15 @@ public class Violation implements Serializable{
     public void setFineInUAH(float fineInUAH){
         this.fineInUAH=fineInUAH;
     }
-    public float getFineInUAH(float fineInUAH){
+    public float getFineInUAH(){
         return this.fineInUAH;
     }
-    public String getID(String ID){
+    public String getID(){
         return ID;
     }
     
-    public Violation(String number, String owner, String type, LocalDateTime time, float fine){
-        this.ID=number+"_"+type.replace(" ", "_")+"_"+time.format(DateTimeFormatter.ISO_DATE);
+    public Violation(String ID, String number, String owner, String type, LocalDateTime time, float fine){
+        this.ID=ID;
         this.carNum=number;
         this.ownerName=owner;
         this.violationType=type;

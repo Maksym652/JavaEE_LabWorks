@@ -8,6 +8,7 @@ import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
+import javax.inject.Inject;
 import javax.servlet.*;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -23,6 +24,9 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet(urlPatterns = {"/EditViolation"})
 public class EditViolationServlet extends HttpServlet {
 
+    @Inject
+    ViolationService vs;
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -134,7 +138,12 @@ public class EditViolationServlet extends HttpServlet {
             requestDispatcher.forward(request, response);
         }
         else{
-            changeViolation(request);
+            String carNum = request.getParameter("carNum");
+            String ownerName = request.getParameter("ownerName");
+            String violationType = request.getParameter("violationType");
+            LocalDateTime dateTime = LocalDateTime.parse(request.getParameter("dateTime"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            float fine = Float.parseFloat(request.getParameter("fine"));
+            changeViolation(request.getParameter("ID"), vs.createViolation(carNum, ownerName, violationType, dateTime, fine));
             response.sendRedirect(request.getContextPath()+"/violationList.html");
         }
     }
@@ -160,13 +169,12 @@ public class EditViolationServlet extends HttpServlet {
         return role.equals("Administrator");
     }
     
-    private void changeViolation(HttpServletRequest request) throws FileNotFoundException, IOException{
+    private void changeViolation(String ID, Violation v) throws FileNotFoundException, IOException{
         StringBuilder buffer;
         try (FileReader fr = new FileReader(getServletContext().getRealPath("/violationList.html"))) {
             Scanner scan = new Scanner(fr);
             buffer = new StringBuilder();
             String str = "";
-            String ID = request.getParameter("ID");
             while(scan.hasNextLine()){
                 str = scan.nextLine();
                 if(str.contains(ID))
@@ -176,15 +184,11 @@ public class EditViolationServlet extends HttpServlet {
                 }
                 buffer.append(str+'\n');
             }
-            DateTimeFormatter dtf1 = DateTimeFormatter.ofPattern("ddMMyy_HHmm");
             DateTimeFormatter dtf2 = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            LocalDateTime datetime = LocalDateTime.parse(request.getParameter("dateTime"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-            String datetimeStr1 = datetime.format(dtf1);
-            String datetimeStr2 = datetime.format(dtf2);
-            str="<tr><td>"+request.getParameter("carNum")+"_"+request.getParameter("violationType").replace(" ", "_")+
-                    "_"+datetimeStr1+"</td><td>"+request.getParameter("carNum")+
-                    "</td><td>"+request.getParameter("ownerName")+"</td><td>"+request.getParameter("violationType")+
-                    "</td><td>"+datetimeStr2+"</td><td>"+request.getParameter("fine")+"</td></tr>\n";
+            String datetimeStr2 = v.getDateTime().format(dtf2);
+            str="<tr><td>"+v.getID()+"</td><td>"+v.getCarNum()+
+                    "</td><td>"+v.getOwnerName()+"</td><td>"+v.getViolationType()+
+                    "</td><td>"+datetimeStr2+"</td><td>"+v.getFineInUAH()+"</td></tr>\n";
             buffer.append(str+'\n');
             while(scan.hasNextLine()){
                str=scan.nextLine();
