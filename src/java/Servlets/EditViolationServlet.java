@@ -1,3 +1,5 @@
+package Servlets;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -5,27 +7,43 @@
  */
 
 import java.io.*;
-import java.util.*;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
+import java.util.Scanner;
+import java.util.Set;
+import javax.annotation.Resource;
+import javax.inject.Inject;
+import javax.servlet.*;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import violation.Violation;
+import violation.ViolationService;
+import workWithDB.DAO;
+import workWithDB.violation.SQLite;
 
 /**
  *
  * @author 1
  */
-@WebServlet(urlPatterns = {"/AddViolation"})
-public class AddViolationServlet extends HttpServlet {
+@WebServlet(urlPatterns = {"/EditViolation"})
+public class EditViolationServlet extends HttpServlet {
 
+    @Inject
+    ViolationService vs;
+    
+    @Resource ValidatorFactory factory;
+    @Resource Validator validator;
+    
+    @Inject @SQLite
+    DAO<Violation> daoViolation;
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -43,10 +61,10 @@ public class AddViolationServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ViolationServlet</title>");            
+            out.println("<title>Servlet EditViolationServlet</title>");            
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ViolationServlet at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet EditViolationServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -64,27 +82,43 @@ public class AddViolationServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html");
-        PrintWriter writer = response.getWriter();
-        String carNumber = request.getParameter("carNum");
-        String ownerName = request.getParameter("ownerName");
-        String violationType = request.getParameter("violationType");
-        String DateTime = request.getParameter("dateTime");
-        String fine = request.getParameter("fine");
-        if(carNumber==null){
+        String ID = request.getParameter("ID");
+        if(ID==""){
             ServletContext servletContext = getServletContext();
-            RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher("/AddViolationForm.html");
+            RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher("/violationNotExistError.html");
             requestDispatcher.forward(request, response);
         }
-        try {
-            writer.println("Car number: "+carNumber+"<br>");
-            writer.println("Owner: "+ownerName+"<br>");
-            writer.println("Type of violation: "+violationType+"<br>");
-            writer.println("Date and time: "+DateTime+"<br>");
-            writer.println("Fine: "+fine+"₴<br>");
-        } finally {
-            writer.close();  
+        if(daoViolation.getByID(ID)==null){
+            ServletContext servletContext = getServletContext();
+            RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher("/violationNotExistError.html");
+            requestDispatcher.forward(request, response);  
         }
+        Violation v = daoViolation.getByID(ID);
+        StringBuilder buffer = new StringBuilder();
+                String carNum = v.getCarNum();
+                String ownerName = v.getOwnerName();
+                String type = v.getViolationType();
+                LocalDateTime dateTime = v.getDateTime();
+                String fine = Float.toString(v.getFineInUAH());
+                Scanner scan;
+                String str;
+                try(FileReader fr2 = new FileReader(getServletContext().getRealPath("/EditViolationForm.html"))){
+                    scan = new Scanner(fr2);
+                    while(scan.hasNextLine()){
+                        buffer.append(scan.nextLine()+'\n');
+                    }
+                    str = buffer.toString();
+                    str=str.replace("_ID_", ID);
+                    str=str.replace("CARNUM", carNum);
+                    str=str.replace("OWNERNAME", ownerName);
+                    str=str.replace("VIOLATIONTYPE", type);
+                    str=str.replace("DATETIME", dateTime.format(DateTimeFormatter.ISO_DATE_TIME));
+                    str=str.replace("FINE", fine);
+                }
+                response.setContentType("text/html");
+                PrintWriter wr = response.getWriter();
+                wr.write(str);
+                wr.close();
     }
 
     /**
@@ -109,11 +143,28 @@ public class AddViolationServlet extends HttpServlet {
             requestDispatcher.forward(request, response);
         }
         else{
-            addViolation(request);
-            response.sendRedirect(request.getContextPath()+"/violationList.html");
+            String carNum = request.getParameter("carNum");
+            String ownerName = request.getParameter("ownerName");
+            String violationType = request.getParameter("violationType");
+            LocalDateTime dateTime = LocalDateTime.parse(request.getParameter("dateTime"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            float fine = Float.parseFloat(request.getParameter("fine"));
+            Violation v = vs.createViolation(request.getParameter("ID"), carNum, ownerName, violationType, dateTime, fine);
+            Set<ConstraintViolation<Violation>> errors = validator.validate(v);
+            if(!errors.isEmpty()){
+                response.setContentType("text/html");
+                PrintWriter writer = response.getWriter();
+                writer.println("<h2>Some of specified params are invalid:</h2>");
+                for(ConstraintViolation<Violation> e : errors){
+                    writer.println(e.getMessage()+'\n');
+                }
+                writer.close();
+            }
+            else{
+                response.sendRedirect(request.getContextPath()+"/GetViolations");
+            }
         }
     }
-    
+
     private boolean hasAllParameters(HttpServletRequest request){
         String carNum = request.getParameter("carNum");
         String ownerName = request.getParameter("ownerName");
@@ -135,42 +186,10 @@ public class AddViolationServlet extends HttpServlet {
         return role.equals("Administrator");
     }
     
-    private void addViolation(HttpServletRequest request) throws IOException{
-                StringBuilder buffer;
-        try (FileReader fr = new FileReader(getServletContext().getRealPath("/violationList.html"))) {
-            Scanner scan = new Scanner(fr);
-            buffer = new StringBuilder();
-            String str = "";
-            while(scan.hasNextLine()){
-                str = scan.nextLine();
-                if(str.equals("            <tr><th>ID</th><th>Car number</th><th>Owner</th><th>Type</th><th>DateTime</th><th>Fine</th></tr>"))
-                {
-                    buffer.append(str).append('\n');
-                    break;
-                }
-                buffer.append(str).append('\n');
-            }
-            DateTimeFormatter dtf1 = DateTimeFormatter.ofPattern("ddMMyy_HHmm");
-            DateTimeFormatter dtf2 = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            LocalDateTime datetime = LocalDateTime.parse(request.getParameter("dateTime"), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-            String datetimeStr1 = datetime.format(dtf1);
-            String datetimeStr2 = datetime.format(dtf2);
-            str="<tr><td>"+request.getParameter("carNum")+"_"+request.getParameter("violationType").replace(" ", "_")+
-                    "_"+datetimeStr1+"</td><td>"+request.getParameter("carNum")+
-                    "</td><td>"+request.getParameter("ownerName")+"</td><td>"+request.getParameter("violationType")+
-                    "</td><td>"+datetimeStr2+"</td><td>"+request.getParameter("fine")+"</td></tr>\n";
-            buffer.append(str).append('\n');
-            while(scan.hasNextLine()){
-               str=scan.nextLine();
-               buffer.append(str).append('\n');
-            }
-        }
-        try(FileWriter fw = new FileWriter(getServletContext().getRealPath("/violationList.html"))){
-            fw.write(buffer.toString());
-            fw.close();
-        }
+    private void changeViolation(Violation v) throws FileNotFoundException, IOException{
+        //daoViolation.update(v);
     }
-
+           
     /**
      * Returns a short description of the servlet.
      *

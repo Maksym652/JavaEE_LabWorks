@@ -1,3 +1,5 @@
+package Servlets;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -12,7 +14,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -74,7 +75,7 @@ public class SetUserRoleServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.addCookie(new Cookie("role", request.getParameter("userRole")));
-        response.sendRedirect(request.getContextPath()+"/violationList.html");
+        response.sendRedirect(request.getContextPath()+"/GetViolations");
     }
 
     /**
