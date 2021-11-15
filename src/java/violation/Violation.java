@@ -12,6 +12,8 @@ import validation.ViolationTime;
 
 @ValidFineValue
 public class Violation implements Serializable{
+    public static DateTimeFormatter violDateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm");
+    
     @NotNull(message="ID must be specified") 
     @Size(min=4,max=25)	
     private String ID;
@@ -59,13 +61,12 @@ public class Violation implements Serializable{
         return this.dateTime;
     }
     public String getDateTimeAsString(){
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm");
-        return this.dateTime.format(dtf);
+        return this.dateTime.format(violDateTimeFormatter);
     }
     public void setFineInUAH(float fineInUAH){
         this.fineInUAH=fineInUAH;
     }
-    public float getFineInUAH(){
+    public float getFine(){
         return this.fineInUAH;
     }
     public String getID(){

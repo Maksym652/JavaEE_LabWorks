@@ -6,13 +6,17 @@ package Servlets;
  * and open the template in the editor.
  */
 
-
+import Lab4EJB.ViolationServiceLocal;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Set;
+import javax.annotation.ManagedBean;
 import javax.annotation.Resource;
+import javax.ejb.EJB;
+import javax.ejb.Local;
+import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -36,8 +40,8 @@ import workWithDB.violation.SQLite;
 @WebServlet(urlPatterns = {"/AddViolation"})
 public class AddViolationServlet extends HttpServlet {
 
-    @Inject
-    ViolationService vs;
+    @EJB
+    ViolationServiceLocal vs;
     
     @Resource ValidatorFactory factory;
     @Resource Validator validator;

@@ -1,9 +1,11 @@
 package Servlets;
 
+import FirestoreDB.FirestoreDB;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import javax.annotation.Resource;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -22,9 +24,12 @@ import workWithDB.violation.SQLite;
 @WebServlet(urlPatterns = {"/GetViolations"})
 public class GetViolationsServlet extends HttpServlet {
 
-   @Inject @SQLite
+   @Inject @FirestoreDB
    DAO<Violation> daoViolation;
-    
+   
+   @Resource(name = "currencySymbol")
+   String currencySymbol;
+   
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -91,7 +96,7 @@ public class GetViolationsServlet extends HttpServlet {
                 String datetimeStr = datetime.format(dtf);
                 str="<tr><td>"+v.getID()+"</td><td>"+v.getCarNum()+
                     "</td><td>"+v.getOwnerName()+"</td><td>"+v.getViolationType()+
-                    "</td><td>"+datetimeStr+"</td><td>"+v.getFineInUAH()+"</td></tr>\n";
+                    "</td><td>"+datetimeStr+"</td><td>"+v.getFine()+" "+currencySymbol+"</td></tr>\n";
                 buffer.append(str).append('\n');
             }
             buffer.append(end);

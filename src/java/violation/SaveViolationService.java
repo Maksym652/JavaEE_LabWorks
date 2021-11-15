@@ -4,9 +4,14 @@
  */
 package violation;
 
+import FirestoreDB.FirestoreDB;
+import javax.annotation.Resource;
+import javax.ejb.EJB;
+import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import workWithDB.DAO;
+import workWithDB.violation.DAOViolationSQLite;
 import workWithDB.violation.SQLite;
 
 /**
@@ -14,7 +19,7 @@ import workWithDB.violation.SQLite;
  * @author User
  */
 public class SaveViolationService {
-    @Inject @SQLite
+    @Inject @FirestoreDB
     DAO<Violation> daoViolation;
     
     public void addViolation(@Observes @Added Violation v){

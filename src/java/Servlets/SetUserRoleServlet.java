@@ -8,12 +8,16 @@ package Servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.Principal;
+import javax.annotation.Resource;
+import javax.ejb.SessionContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -71,11 +75,17 @@ public class SetUserRoleServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        /*HttpSession session = request.getSession();
+        session.setAttribute("name", request.getParameter("userName"));
+        session.setAttribute("role", request.getParameter("userRole").toLowerCase() );*/
         response.addCookie(new Cookie("role", request.getParameter("userRole")));
         response.sendRedirect(request.getContextPath()+"/GetViolations");
+        
+        
     }
 
     /**

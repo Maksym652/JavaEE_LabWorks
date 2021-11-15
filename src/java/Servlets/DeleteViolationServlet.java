@@ -6,12 +6,15 @@ package Servlets;
  * and open the template in the editor.
  */
 
+import FirestoreDB.FirestoreDB;
+import Lab4EJB.ErrorWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
+import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.ServletException;
@@ -30,8 +33,11 @@ import workWithDB.violation.SQLite;
 @WebServlet(urlPatterns = {"/DeleteViolation"})
 public class DeleteViolationServlet extends HttpServlet {
     
-    @Inject @SQLite
+    @Inject @FirestoreDB
     DAO<Violation> daoViolation;
+    
+    @EJB
+    ErrorWriter ew;
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -50,8 +56,15 @@ public class DeleteViolationServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        removeViolation(request.getParameter("ID"));
-        response.sendRedirect(request.getContextPath()+"/GetViolations");
+        String ID = request.getParameter("ID");
+        if(daoViolation.getByID(ID)==null){
+             ew.write("Record with ID=''"+ID+"'' not found;");
+             response.sendRedirect(request.getContextPath()+"/violationNotExistError");
+        }
+        else{
+            removeViolation(ID);
+            response.sendRedirect(request.getContextPath()+"/GetViolations");   
+        }
     }
     public void removeViolation(String ID) throws FileNotFoundException, IOException{
         daoViolation.delete(ID);

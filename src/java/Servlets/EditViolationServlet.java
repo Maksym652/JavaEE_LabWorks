@@ -6,12 +6,16 @@ package Servlets;
  * and open the template in the editor.
  */
 
+import FirestoreDB.FirestoreDB;
+import Lab4EJB.ViolationServiceLocal;
+import Lab4EJB.ViolationServiceRemote;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import java.util.Set;
 import javax.annotation.Resource;
+import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.*;
 import javax.servlet.ServletException;
@@ -35,13 +39,13 @@ import workWithDB.violation.SQLite;
 @WebServlet(urlPatterns = {"/EditViolation"})
 public class EditViolationServlet extends HttpServlet {
 
-    @Inject
-    ViolationService vs;
+    @EJB
+    ViolationServiceLocal vs;
     
     @Resource ValidatorFactory factory;
     @Resource Validator validator;
     
-    @Inject @SQLite
+    @Inject @FirestoreDB
     DAO<Violation> daoViolation;
     
     /**
@@ -99,7 +103,7 @@ public class EditViolationServlet extends HttpServlet {
                 String ownerName = v.getOwnerName();
                 String type = v.getViolationType();
                 LocalDateTime dateTime = v.getDateTime();
-                String fine = Float.toString(v.getFineInUAH());
+                String fine = Float.toString(v.getFine());
                 Scanner scan;
                 String str;
                 try(FileReader fr2 = new FileReader(getServletContext().getRealPath("/EditViolationForm.html"))){

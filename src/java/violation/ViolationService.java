@@ -1,5 +1,7 @@
 package violation;
 
+import Lab4EJB.ViolationServiceLocal;
+import Lab4EJB.ViolationServiceRemote;
 import idGenerators.CurrentTime;
 import idGenerators.IdGenerator;
 import idGenerators.NumInDbAndCurrentTime;
@@ -11,7 +13,15 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.Resource;
+import javax.ejb.Local;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
+import javax.ejb.Remote;
+import javax.ejb.Stateful;
+import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
@@ -19,19 +29,11 @@ import javax.inject.Named;
 import javax.validation.ConstraintViolation;
 import javax.validation.*;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
-/**
- *
-// * @author 1
- */
 @Named
-public class ViolationService {
-    @Inject @NumberInDB
+@Stateless
+public class ViolationService implements ViolationServiceLocal, ViolationServiceRemote{
+    @Inject @CurrentTime
     private IdGenerator idGenerator;
    
     @Inject @Added
@@ -42,6 +44,9 @@ public class ViolationService {
     @Resource ValidatorFactory factory;
     @Resource Validator validator;
     
+    public ViolationService(){}
+    
+    @Override
     public Violation createViolation(String number, String owner, String type, LocalDateTime time, float fine){
         Violation v = new Violation(idGenerator.generate(), number, owner, type, time, fine);
         Set<ConstraintViolation<Violation>> errors = validator.validate(v);
@@ -50,11 +55,13 @@ public class ViolationService {
         }
         else{
             for(ConstraintViolation<Violation> error : errors){
-                System.out.println(error);
+                System.out.println(error.getMessage());
             }
         }
         return v;
     }
+
+    @Override
     public Violation createViolation(String ID, String number, String owner, String type, LocalDateTime time, float fine){
         Violation v = new Violation(ID, number, owner, type, time, fine);
          Set<ConstraintViolation<Violation>> errors = validator.validate(v);
@@ -63,10 +70,9 @@ public class ViolationService {
         }
         else{
             for(ConstraintViolation<Violation> error : errors){
-                System.out.println(error);
+                System.out.println(error.getMessage());
             }
         };
         return v;
     }
-
 }

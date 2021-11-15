@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "carviolations-60250",
+  "private_key_id": "d2d7b0323a5072c1368a2622e16e5b940d56e4a1",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC3+blTHzxK/qsm\nQPSB4sWXU0fpf/nD+zydCMwyOnPo0Ao3xS0yZHWkvAaBF5yTfgtmcFhLLYULuHHn\n6jCvhfJ3eZViEFjOxKVpL3AtJUam6n632Qt8DET2ro7ZZycBH+Zs96tjMgyN7GF7\n9XMfS8WsMzo5NE3EU12prV4ymP5hxL+nIxe32lDjVducKOpDJGkwuJhaneg/sbmh\n2ruzrDehmCBxHBbOOmL38MLWNCTCqZ8xHxo5LDGYf5l1aqXdPnt55oBUwZC7ZAIR\n9mPbbAWUfj5oWx7T9jFahU+LRtb0YTOx+uR1FbmoSIp8n47j+XybyD1IA2LJTCby\nhzclhZARAgMBAAECggEAC3eRY3LTll2SA6ICE3vz4qseVPmk8uAcnrGbD6joy1q3\nPlNoDidolUZideanu+I7+ew39qSdUbYTBHhqhTA5RRTjGKAJ9wZXBIvAR1IW2aXN\nVO5+eqKFpGYMMZUOP3HSchmMWVQX5/szNs+dV7aoeSOexgzCaaGkGYS8tbTnSybl\nwEeWywRBcV01U+X6nRpbEW7SGaoerewz02T66NgbXFJ3r8e4hOg8vIXM7POZAw1z\nSNvAgOkkJBchP6Xxj3omy0pi6uBYfv7tz1mZIg1NNeWv3lLkQUqG5/J/kyxaxtL8\noMteBFQr009Fc/oROgCnFtR4zIIfAn1onafFXUbZeQKBgQD+olvds8XeP+3qylVF\nJteJNZt2Gc8GSTc87gYdzKsRRks/uipM98M4xzyUVzz5I7vEjbQ0eeAf5mZ5P4Wg\n9ny2WbJCgZphl/SA2iW+GCXHKUgkyOikNqZa/1RuX6CNxn3dlsMnKzs9aa7IDQVK\nXxTsT4yRcKIbjUPy3xdd/Eg+yQKBgQC49le/VxdjVNjmSszaMeZh+uLBIYOaHde/\nksa9Y7WYi9Vfex+s9FXUtx0MPR0Cg/Gx6imAfEko2H18kanAWlzCjVc81EG9pQ7V\nG66OVJRSgf+Vd2J2N1RqYoeDDXZss7ouQQIXARjjKng26J4V61/AfAPrA59SFczt\nKxweoMcDCQKBgDtuKYLVMpls0lq6XqyFJEkh+ebWnzsYW4wdAdBytHqTrXxyNu0/\n5pCZ78mvksuTS3/Ukvqsd2L6o3ApI0cuQG1PAgwDs8STcr2gLK7xc9/IAs6TFbk+\nCBW1Aj/AkfiFG1tclK/Pp0PuJp0KbPGuv3NoHabUYwGLNxC4gPuupi4BAoGBALT1\nHkgu9szR2BsHF4BpzZISmQKGvXBsvgXJnfLwuFv0gt8VYJofulGQjTTKHbW2TSLZ\ni50O+6ygkbTr9f4g6hvVmIIE0ASwleBdYtwRV8OZN+qNkKFD5KzolNfctf4HoKFc\nLKVBB45IoLBnyTJ8w4NYUaT+OENg3Ms0oCA/ADWxAoGBAIHIcTIDRX5olX79zDRL\nOGL91iSqClmJBbOJMoFbLjI33PZdXH7hpYqU0b21ahjrC8bEmf8le1BuipcovKex\n7z7l0ORm+gdr1KXk03fVPErzGaxwjgojhlJcIvzYhRr9HEs4TXCVYKk5jxqft7Lv\n+xXnRogD48M4BRWqsSBxbsB8\n-----END PRIVATE KEY-----\n",
+  "client_email": "myserviceaccount@carviolations-60250.iam.gserviceaccount.com",
+  "client_id": "106844431164429124537",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/myserviceaccount%40carviolations-60250.iam.gserviceaccount.com"
+}

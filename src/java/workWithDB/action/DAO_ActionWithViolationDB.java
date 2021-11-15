@@ -25,7 +25,7 @@ import workWithDB.SQLiteConnection;
  *
  * @author User
  */
-@ApplicationScoped
+@RequestScoped
 @ActionWithViolDB
 public class DAO_ActionWithViolationDB implements DAO<ActionWithViolationDB> {
 

@@ -19,7 +19,7 @@ public class IdGeneratorByCurrentDateTime implements IdGenerator{
     @Override
     public String generate(){
        LocalDateTime datetime = LocalDateTime.now();
-       DateTimeFormatter dtf = DateTimeFormatter.ofPattern("ddMMyyHHmmss");
+       DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yy_HH:mm:ss");
        String id = datetime.format(dtf);
        return id;
     }

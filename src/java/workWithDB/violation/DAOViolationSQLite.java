@@ -15,9 +15,16 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import javax.ejb.Local;
+import javax.ejb.LocalBean;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Stateless;
+import javax.ejb.Singleton;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.interceptor.AroundInvoke;
@@ -48,7 +55,7 @@ public class DAOViolationSQLite implements DAO<Violation>{
             preparedStatement.setString(3,entity.getOwnerName());
             preparedStatement.setString(4,entity.getViolationType());
             preparedStatement.setString(5,entity.getDateTime().format(DateTimeFormatter.ISO_DATE_TIME));
-            preparedStatement.setString(6,Float.toString(entity.getFineInUAH()));
+            preparedStatement.setString(6,Float.toString(entity.getFine()));
             operationIsSuccessful = preparedStatement.execute();
         }
         catch (SQLException e) {
@@ -67,7 +74,7 @@ public class DAOViolationSQLite implements DAO<Violation>{
             preparedStatement.setString(2,entity.getOwnerName());
             preparedStatement.setString(3,entity.getViolationType());
             preparedStatement.setString(4,entity.getDateTime().format(DateTimeFormatter.ISO_DATE_TIME));
-            preparedStatement.setString(5,Float.toString(entity.getFineInUAH()));
+            preparedStatement.setString(5,Float.toString(entity.getFine()));
             preparedStatement.setString(6,entity.getID());
             result = preparedStatement.execute();
         }

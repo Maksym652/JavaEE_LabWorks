@@ -24,7 +24,7 @@ public class FineValidator implements ConstraintValidator<ValidFineValue, Violat
         ViolationType vt = daoViolType.getByID(value.getViolationType());
         if(vt==null)
             return false;
-        return value.getFineInUAH()>=vt.getMinFine() && value.getFineInUAH()<=vt.getMaxFine();
+        return value.getFine()>=vt.getMinFine() && value.getFine()<=vt.getMaxFine();
     }
     
 }
